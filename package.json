@@ -1,0 +1,26 @@
+{
+  "name": "cosmic-tasks",
+  "version": "1.0.0",
+  "description": "Frontend tests for cosmic-tasks app.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "setupFiles": [
+      "./tests/jest.setup.js"
+    ],
+    "testEnvironmentOptions": {
+      "url": "http://localhost"
+    }
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

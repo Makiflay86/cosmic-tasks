@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cosmic Tasks</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stars"></canvas>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <h1>Cosmic Tasks</h1>
+      </div>
+      <p class="subtitle">Mission Control — Task Manager</p>
+    </header>
+    <section class="stats">
+      <div class="stat-card" id="stat-total"><div class="stat-value">—</div><div class="stat-label">Total Missions</div></div>
+      <div class="stat-card completed" id="stat-done"><div class="stat-value">—</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card pending" id="stat-pending"><div class="stat-value">—</div><div class="stat-label">Pending</div></div>
+      <div class="stat-card critical" id="stat-high"><div class="stat-value">—</div><div class="stat-label">Critical</div></div>
+    </section>
+    <div class="progress-container">
+      <div class="progress-label"><span>Mission Progress</span><span id="progress-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <section class="add-task">
+      <h2>+ New Mission</h2>
+      <form id="task-form">
+        <input type="text" id="task-title" placeholder="Mission title..." required />
+        <input type="text" id="task-desc" placeholder="Description (optional)" />
+        <select id="task-priority">
+          <option value="low">🟢 Low Priority</option>
+          <option value="medium" selected>🟡 Medium Priority</option>
+          <option value="high">🔴 High Priority</option>
+        </select>
+        <button type="submit">Launch Mission</button>
+      </form>
+    </section>
+    <section class="task-list">
+      <div class="task-list-header">
+        <h2>Active Missions</h2>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+      </div>
+      <div id="tasks-container"></div>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

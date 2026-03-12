@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosmic Tasks – Frontend Unit Tests</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b0d1a; color: #c8d0f0; min-height: 100vh; padding: 2rem; }
+    h1 { font-size: 1.75rem; font-weight: 700; color: #a78bfa; margin-bottom: 0.25rem; }
+    .subtitle { color: #6b7280; font-size: 0.875rem; margin-bottom: 2rem; }
+    .summary { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .summary-box { padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; }
+    .summary-box.total   { background: #1e2340; color: #a0aec0; }
+    .summary-box.passed  { background: #0d2b1e; color: #34d399; }
+    .summary-box.failed  { background: #2b0d0d; color: #f87171; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead th { background: #1a1d35; color: #818cf8; text-align: left; padding: 0.6rem 0.85rem; font-weight: 600; border-bottom: 2px solid #2e3156; }
+    tbody tr:nth-child(even) { background: #0f1124; }
+    tbody tr:nth-child(odd)  { background: #0b0d1a; }
+    tbody tr:hover           { background: #161932; }
+    td { padding: 0.55rem 0.85rem; border-bottom: 1px solid #1e2040; vertical-align: top; }
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .badge.pass { background: #064e3b; color: #34d399; }
+    .badge.fail { background: #7f1d1d; color: #fca5a5; }
+    .section-header td { background: #111430; color: #818cf8; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; padding: 0.5rem 0.85rem; }
+    .expected, .actual { font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; }
+    .actual.mismatch { color: #f87171; }
+    .actual.match    { color: #34d399; }
+  </style>
+</head>
+<body>
+<h1>Cosmic Tasks – Frontend Unit Tests</h1>
+<p class="subtitle">Pure-function tests for <code>escHtml</code> and <code>fmtDate</code> — no imports, runs standalone in browser.</p>
+<div class="summary" id="summary"></div>
+<table>
+  <thead><tr><th>Status</th><th>Test Name</th><th>Input</th><th>Expected</th><th>Actual</th></tr></thead>
+  <tbody id="results"></tbody>
+</table>
+<script>
+  function escHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  const suite = [];
+  function test(section, name, input, expected, actual) {
+    suite.push({ section, name, input, expected, actual, pass: actual === expected });
+  }
+  test('escHtml', 'escapes ampersand', 'a & b', 'a &amp; b', escHtml('a & b'));
+  test('escHtml', 'escapes less-than', '<script>', '&lt;script&gt;', escHtml('<script>'));
+  test('escHtml', 'escapes greater-than', 'a > b', 'a &gt; b', escHtml('a > b'));
+  test('escHtml', 'escapes double quote', '"hello"', '&quot;hello&quot;', escHtml('"hello"'));
+  test('escHtml', 'escapes all specials combined', '<a href="x&y">', '&lt;a href=&quot;x&amp;y&quot;&gt;', escHtml('<a href="x&y">'));
+  test('escHtml', 'empty string returns empty string', '', '', escHtml(''));
+  test('escHtml', 'plain text unchanged', 'Hello World', 'Hello World', escHtml('Hello World'));
+  test('escHtml', 'multiple ampersands', 'a & b & c', 'a &amp; b &amp; c', escHtml('a & b & c'));
+  test('escHtml', 'multiple < in a row', '<<', '&lt;&lt;', escHtml('<<'));
+  test('escHtml', 'mixed HTML tag with attributes', '<img src="photo.jpg" alt="A & B">', '&lt;img src=&quot;photo.jpg&quot; alt=&quot;A &amp; B&quot;&gt;', escHtml('<img src="photo.jpg" alt="A & B">'));
+  test('fmtDate', '2024-01-15 → Jan 15, 2024', '2024-01-15', 'Jan 15, 2024', fmtDate('2024-01-15'));
+  test('fmtDate', '2024-12-31 → Dec 31, 2024', '2024-12-31', 'Dec 31, 2024', fmtDate('2024-12-31'));
+  test('fmtDate', '2000-06-01 → Jun 1, 2000', '2000-06-01', 'Jun 1, 2000', fmtDate('2000-06-01'));
+  test('fmtDate', '1999-11-09 → Nov 9, 1999', '1999-11-09', 'Nov 9, 1999', fmtDate('1999-11-09'));
+  test('fmtDate', '2024-03-07 → Mar 7, 2024', '2024-03-07', 'Mar 7, 2024', fmtDate('2024-03-07'));
+  test('fmtDate', '2024-07-04 → Jul 4, 2024', '2024-07-04', 'Jul 4, 2024', fmtDate('2024-07-04'));
+  test('fmtDate', '2024-10-31 → Oct 31, 2024', '2024-10-31', 'Oct 31, 2024', fmtDate('2024-10-31'));
+  const tbody = document.getElementById('results');
+  let totalPass = 0, totalFail = 0, lastSection = null;
+  suite.forEach(({ section, name, input, expected, actual, pass }) => {
+    if (pass) totalPass++; else totalFail++;
+    if (section !== lastSection) {
+      lastSection = section;
+      const sep = document.createElement('tr');
+      sep.className = 'section-header';
+      sep.innerHTML = `<td colspan="5">${section}</td>`;
+      tbody.appendChild(sep);
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="badge ${pass?'pass':'fail'}">${pass?'PASS':'FAIL'}</span></td><td>${name}</td><td><span class="expected">${escHtml(String(input))}</span></td><td><span class="expected">${escHtml(String(expected))}</span></td><td><span class="actual ${pass?'match':'mismatch'}">${escHtml(String(actual))}</span></td>`;
+    tbody.appendChild(tr);
+  });
+  const total = totalPass + totalFail;
+  document.getElementById('summary').innerHTML = `<div class="summary-box total">Total: ${total}</div><div class="summary-box passed">Passed: ${totalPass}</div><div class="summary-box failed">Failed: ${totalFail}</div>`;
+  document.title = `Tests: ${totalPass}/${total} passed`;
+</script>
+</body>
+</html>
